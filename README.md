@@ -13,8 +13,8 @@ Some browsers, including some versions of Chrome, Safari and UC Browser, might h
 ## Usage
 
 ```
-var classNames = require('should-send-same-site-none'); // 
-import KeyboardEventHandler from 'react-keyboard-event-handler';
+var shouldSendSameSiteNone = require('should-send-same-site-none');
+// import shouldSendSameSiteNone from 'should-send-same-site-none';
 
 var ua = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14) AppleWebKit/537.36 (KHTML, like Gecko)';
 
