@@ -1,0 +1,18 @@
+{
+  "name": "should-send-same-site-none",
+  "version": "1.0.0",
+  "description": "A simple utility to detect incompatible user agents for `SameSite=None` cookie attribute",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/linsight/should-send-same-site-none.git"
+  },
+  "author": "David Lin",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^24.9.0"
+  }
+}
