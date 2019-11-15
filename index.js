@@ -7,7 +7,7 @@ function stringToInt(strValue) {
 }
 
 // Don’t send `SameSite=None` to known incompatible clients.
-function isSameSiteNoneCompactible(useragent) {
+function isSameSiteNoneCompatible(useragent) {
   return !isSameSiteNoneIncompatible(useragent);
 }
 
@@ -115,7 +115,7 @@ var shouldSendSameSiteNone = function(req, res, next) {
   var end = res.end;
   res.end = function() {
     var ua = req.get("user-agent");
-    var isCompatible = isSameSiteNoneCompactible(ua);
+    var isCompatible = isSameSiteNoneCompatible(ua);
     var cookies = res.get("Set-Cookie");
     var removeSameSiteNone = function(str) {
       return str.replace(/ SameSite=None;?/g, "");
@@ -136,5 +136,5 @@ var shouldSendSameSiteNone = function(req, res, next) {
 
 module.exports = {
   shouldSendSameSiteNone: shouldSendSameSiteNone,
-  isSameSiteNoneCompactible: isSameSiteNoneCompactible
+  isSameSiteNoneCompatible: isSameSiteNoneCompatible
 };

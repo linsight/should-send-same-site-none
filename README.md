@@ -2,7 +2,7 @@
 
 The module comes with:
 
-- A small **utility function** `isSameSiteNoneCompactible` for detecting incompatible user agents (browsers) for the `SameSite=None` cookie attribute.
+- A small **utility function** `isSameSiteNoneCompatible` for detecting incompatible user agents (browsers) for the `SameSite=None` cookie attribute.
 
 - A **Express middleware** `shouldSendSameSiteNone` for automatically removing `SameSite=None` from response header when reqesting client is incompatible with `SameSite=None`.
 
@@ -12,17 +12,17 @@ With Chrome 80 in February 2020, Chrome will treat cookies that have no declared
 
 If you manage cross-site cookies, you will need to apply the SameSite=None; Secure setting to those cookies. However, some browsers, including some versions of Chrome, Safari and UC Browser, might handle the None value in unintended ways, requiring developers to code exceptions for those clients.
 
-`isSameSiteNoneCompactible` utility function detects incompatible user agents based on a [list of known incompatible clients](https://www.chromium.org/updates/same-site/incompatible-clients) and returns `true` if the given user-agent string is compatible with `SameSite=None` cookie attribute.
+`isSameSiteNoneCompatible` utility function detects incompatible user agents based on a [list of known incompatible clients](https://www.chromium.org/updates/same-site/incompatible-clients) and returns `true` if the given user-agent string is compatible with `SameSite=None` cookie attribute.
 
 For Express.js, `shouldSendSameSiteNone` middleware automatically removes `SameSite=None` from set-cookie response header when the reqesting client is incompatible with `SameSite=None`.
 
 ## Usage
 
-#### Function: `isSameSiteNoneCompactible`
+#### Function: `isSameSiteNoneCompatible`
 
 ```
 
-import { isSameSiteNoneCompactible } from 'should-send-same-site-none';
+import { isSameSiteNoneCompatible } from 'should-send-same-site-none';
 
 const ua = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14) ....';
 

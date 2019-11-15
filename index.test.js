@@ -2,7 +2,7 @@ const express = require("express");
 const supertest = require("supertest");
 var http = require("http");
 const {
-  isSameSiteNoneCompactible,
+  isSameSiteNoneCompatible,
   shouldSendSameSiteNone
 } = require("./index");
 
@@ -79,11 +79,11 @@ const positiveTestCases = {
     "Mozilla/5.0 (iPhone; CPU iPhone OS 13_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/66.6 Mobile/14A5297c Safari/602.1"
 };
 
-describe("isSameSiteNoneCompactible", () => {
+describe("isSameSiteNoneCompatible", () => {
   for (const i in positiveTestCases) {
     if (positiveTestCases.hasOwnProperty(i)) {
       it(`Test ${i} (true)`, () => {
-        expect(isSameSiteNoneCompactible(positiveTestCases[i])).toBe(true);
+        expect(isSameSiteNoneCompatible(positiveTestCases[i])).toBe(true);
       });
     }
   }
@@ -91,7 +91,7 @@ describe("isSameSiteNoneCompactible", () => {
   for (const i in negativeTestCases) {
     if (negativeTestCases.hasOwnProperty(i)) {
       it(`Test ${i} (false)`, () => {
-        expect(isSameSiteNoneCompactible(negativeTestCases[i])).toBe(false);
+        expect(isSameSiteNoneCompatible(negativeTestCases[i])).toBe(false);
       });
     }
   }
