@@ -1,6 +1,6 @@
 {
   "name": "should-send-same-site-none",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "A simple utility to detect incompatible user agents for `SameSite=None` cookie attribute",
   "main": "index.js",
   "scripts": {
