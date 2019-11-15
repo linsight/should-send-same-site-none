@@ -7,7 +7,7 @@ function stringToInt(strValue) {
 }
 
 // Don’t send `SameSite=None` to known incompatible clients.
-function shouldSendSameSiteNone(useragent) {
+function isSameSiteNoneCompactible(useragent) {
   return !isSameSiteNoneIncompatible(useragent);
 }
 
@@ -111,4 +111,30 @@ function isUcBrowserVersionAtLeast(major, minor, build, useragent) {
   return build_version >= build;
 }
 
-module.exports = shouldSendSameSiteNone;
+var shouldSendSameSiteNone = function(req, res, next) {
+  var end = res.end;
+  res.end = function() {
+    var ua = req.get("user-agent");
+    var isCompatible = isSameSiteNoneCompactible(ua);
+    var cookies = res.get("Set-Cookie");
+    var removeSameSiteNone = function(str) {
+      return str.replace(/ SameSite=None;?/g, "");
+    };
+    if (!isCompatible && cookies) {
+      if (Array.isArray(cookies)) {
+        cookies = cookies.map(removeSameSiteNone);
+      } else {
+        cookies = removeSameSiteNone(cookies);
+      }
+      res.set("Set-Cookie", cookies);
+    }
+
+    end.apply(this, arguments);
+  };
+  next();
+};
+
+module.exports = {
+  shouldSendSameSiteNone: shouldSendSameSiteNone,
+  isSameSiteNoneCompactible: isSameSiteNoneCompactible
+};

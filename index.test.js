@@ -1,4 +1,10 @@
-const shouldSendSameSiteNone = require("./index");
+const express = require("express");
+const supertest = require("supertest");
+var http = require("http");
+const {
+  isSameSiteNoneCompactible,
+  shouldSendSameSiteNone
+} = require("./index");
 
 const negativeTestCases = {
   "Chrome 51":
@@ -73,18 +79,158 @@ const positiveTestCases = {
     "Mozilla/5.0 (iPhone; CPU iPhone OS 13_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/66.6 Mobile/14A5297c Safari/602.1"
 };
 
-for (const i in positiveTestCases) {
-  if (positiveTestCases.hasOwnProperty(i)) {
-    test(`Test ${i} (true)`, () => {
-      expect(shouldSendSameSiteNone(positiveTestCases[i])).toBe(true);
-    });
+describe("isSameSiteNoneCompactible", () => {
+  for (const i in positiveTestCases) {
+    if (positiveTestCases.hasOwnProperty(i)) {
+      it(`Test ${i} (true)`, () => {
+        expect(isSameSiteNoneCompactible(positiveTestCases[i])).toBe(true);
+      });
+    }
   }
-}
 
-for (const i in negativeTestCases) {
-  if (negativeTestCases.hasOwnProperty(i)) {
-    test(`Test ${i} (false)`, () => {
-      expect(shouldSendSameSiteNone(negativeTestCases[i])).toBe(false);
-    });
+  for (const i in negativeTestCases) {
+    if (negativeTestCases.hasOwnProperty(i)) {
+      it(`Test ${i} (false)`, () => {
+        expect(isSameSiteNoneCompactible(negativeTestCases[i])).toBe(false);
+      });
+    }
   }
-}
+});
+
+describe("shouldSendSameSiteNone with mutiple cookies", () => {
+  let app, server;
+  beforeEach(done => {
+    app = new express();
+    app.use(shouldSendSameSiteNone);
+    app.get("/", (req, res, next) => {
+      res.cookie("foo", "bar", { sameSite: "none" });
+      res.cookie("koo", "mar", { sameSite: "none" });
+      res.send("ok");
+    });
+    server = http.createServer(app);
+    server.listen(done);
+  });
+
+  afterEach(done => {
+    server.close(done);
+  });
+
+  for (const i in negativeTestCases) {
+    if (negativeTestCases.hasOwnProperty(i)) {
+      it(`Remove SameSite=None attributes in ${i}`, async done => {
+        const response = await supertest(app)
+          .get("/")
+          .set("User-Agent", negativeTestCases[i]);
+        const expected = ["foo=bar; Path=/;,koo=mar; Path=/;"];
+        expect(response.header["set-cookie"]).toEqual(expected);
+        expect(response.text).toEqual("ok");
+        done();
+      });
+    }
+  }
+
+  for (const i in positiveTestCases) {
+    if (positiveTestCases.hasOwnProperty(i)) {
+      it(`Keep SameSite=None attributes in ${i}`, async done => {
+        const response = await supertest(app)
+          .get("/")
+          .set("User-Agent", positiveTestCases[i]);
+        const expected = [
+          "foo=bar; Path=/; SameSite=None,koo=mar; Path=/; SameSite=None"
+        ];
+        expect(response.header["set-cookie"]).toEqual(expected);
+        expect(response.text).toEqual("ok");
+        done();
+      });
+    }
+  }
+});
+
+describe("shouldSendSameSiteNone with single cookies", () => {
+  let app, server;
+  beforeEach(done => {
+    app = new express();
+    app.use(shouldSendSameSiteNone);
+    app.get("/", (req, res, next) => {
+      res.cookie("foo", "bar", { sameSite: "none" });
+      res.send("ok");
+    });
+    server = http.createServer(app);
+    server.listen(done);
+  });
+
+  afterEach(done => {
+    server.close(done);
+  });
+
+  for (const i in negativeTestCases) {
+    if (negativeTestCases.hasOwnProperty(i)) {
+      it(`Remove SameSite=None attributes in ${i}`, async done => {
+        const response = await supertest(app)
+          .get("/")
+          .set("User-Agent", negativeTestCases[i]);
+        const expected = ["foo=bar; Path=/;"];
+        expect(response.header["set-cookie"]).toEqual(expected);
+        expect(response.text).toEqual("ok");
+        done();
+      });
+    }
+  }
+
+  for (const i in positiveTestCases) {
+    if (positiveTestCases.hasOwnProperty(i)) {
+      it(`Keep SameSite=None attributes in ${i}`, async done => {
+        const response = await supertest(app)
+          .get("/")
+          .set("User-Agent", positiveTestCases[i]);
+        const expected = ["foo=bar; Path=/; SameSite=None"];
+        expect(response.header["set-cookie"]).toEqual(expected);
+        expect(response.text).toEqual("ok");
+        done();
+      });
+    }
+  }
+});
+
+describe("shouldSendSameSiteNone with no cookies", () => {
+  let app, server;
+  beforeEach(done => {
+    app = new express();
+    app.use(shouldSendSameSiteNone);
+    app.get("/", (req, res, next) => {
+      res.send("ok");
+    });
+    server = http.createServer(app);
+    server.listen(done);
+  });
+
+  afterEach(done => {
+    server.close(done);
+  });
+
+  for (const i in negativeTestCases) {
+    if (negativeTestCases.hasOwnProperty(i)) {
+      it(`Remove SameSite=None attributes in ${i}`, async done => {
+        const response = await supertest(app)
+          .get("/")
+          .set("User-Agent", negativeTestCases[i]);
+        expect(response.header["set-cookie"]).toEqual(undefined);
+        expect(response.text).toEqual("ok");
+        done();
+      });
+    }
+  }
+
+  for (const i in positiveTestCases) {
+    if (positiveTestCases.hasOwnProperty(i)) {
+      it(`Keep SameSite=None attributes in ${i}`, async done => {
+        const response = await supertest(app)
+          .get("/")
+          .set("User-Agent", positiveTestCases[i]);
+        expect(response.header["set-cookie"]).toEqual(undefined);
+        expect(response.text).toEqual("ok");
+        done();
+      });
+    }
+  }
+});

@@ -4,7 +4,7 @@
   "description": "A simple utility to detect incompatible user agents for `SameSite=None` cookie attribute",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest --detectOpenHandles"
   },
   "repository": {
     "type": "git",
@@ -13,6 +13,8 @@
   "author": "David Lin",
   "license": "MIT",
   "devDependencies": {
-    "jest": "^24.9.0"
+    "express": "^4.17.1",
+    "jest": "^24.9.0",
+    "supertest": "^4.0.2"
   }
 }

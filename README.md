@@ -1,22 +1,30 @@
 # should-send-same-site-none
 
-This is a small utility function for detecting incompatible user agents (browsers) for the `SameSite=None` cookie attribute.
+The module comes with:
 
-With Chrome 80 in February 2020, [Chrome will treat cookies that have no declared SameSite value as `SameSite=Lax` cookies](https://blog.chromium.org/2019/10/developers-get-ready-for-new.html). Other browser vendors are expected to follow Google’s lead.
+- A small **utility function** `isSameSiteNoneCompactible` for detecting incompatible user agents (browsers) for the `SameSite=None` cookie attribute.
 
-Some browsers, including some versions of Chrome, Safari and UC Browser, might handle the  None value in unintended ways, requiring developers to code exceptions for those clients. 
+- A **Express middleware** `shouldSendSameSiteNone` for automatically removing `SameSite=None` from response header when reqesting client is incompatible with `SameSite=None`.
 
+## Background
 
-`shouldSendSameSiteNone` utility function detect incompatible user agents based on the [list of known incompatible clients](https://www.chromium.org/updates/same-site/incompatible-clients) and returns `true` if the given user-agent string is compatible with `SameSite=None` cookie attribute.
+With Chrome 80 in February 2020, Chrome will treat cookies that have no declared SameSite value as `SameSite=Lax` cookies. Other browser vendors are expected to follow Google’s lead. (See this [Blog Post](https://blog.chromium.org/2019/10/developers-get-ready-for-new.html)).
 
+If you manage cross-site cookies, you will need to apply the SameSite=None; Secure setting to those cookies. However, some browsers, including some versions of Chrome, Safari and UC Browser, might handle the None value in unintended ways, requiring developers to code exceptions for those clients.
+
+`isSameSiteNoneCompactible` utility function detects incompatible user agents based on a [list of known incompatible clients](https://www.chromium.org/updates/same-site/incompatible-clients) and returns `true` if the given user-agent string is compatible with `SameSite=None` cookie attribute.
+
+For Express.js, `shouldSendSameSiteNone` middleware automatically removes `SameSite=None` from set-cookie response header when the reqesting client is incompatible with `SameSite=None`.
 
 ## Usage
 
-```
-var shouldSendSameSiteNone = require('should-send-same-site-none');
-// import shouldSendSameSiteNone from 'should-send-same-site-none';
+#### Function: `isSameSiteNoneCompactible`
 
-var ua = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14) AppleWebKit/537.36 (KHTML, like Gecko)';
+```
+
+import { isSameSiteNoneCompactible } from 'should-send-same-site-none';
+
+const ua = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14) ....';
 
 if (shouldSendSameSiteNone(ua)) {
 	console.log("Yes, the browser is compatible and we can set SameSite=None cookies");
@@ -25,6 +33,23 @@ if (shouldSendSameSiteNone(ua)) {
 
 ```
 
+#### Middleware: `shouldSendSameSiteNone`
+
+```
+const express = require('express');
+const { shouldSendSameSiteNone } = require('should-send-same-site-none');
+const app = express();
+
+app.use(shouldSendSameSiteNone); // Apply middle ware before routes
+
+app.get('/', function (req, res) {
+  res.send('hello world');
+});
+
+app.listen(3000);
+
+
+```
 
 ## Running tests
 
@@ -80,13 +105,9 @@ The following incompatible clients were accounted for at the time of writing:
 - Versions of UC Browser on Android prior to version 12.13.2. Older versions will reject a cookie with `SameSite=None`. This behavior was correct according to the version of the cookie specification at that time, but with the addition of the new "None" value to the specification, this behavior has been updated in newer versions of UC Browser.
 - Versions of Safari and embedded browsers on MacOS 10.14 and all browsers on iOS 12. These versions will erroneously treat cookies marked with `SameSite=None` as if they were marked `SameSite=Strict`. This bug has been fixed on newer versions of iOS and MacOS.
 
-
 Compatibilities of the following clients are unclear:
 
 1. Versions of Chrome from Chrome 51 to Chrome 66 on **IOS device**; (Assumed compatible)
 2. Versions of UC Browser on other non-Android platforms (e.g. IOS) prior to version 12.13.2. (Assumed Incompatible)
 
-
 Please file an issue if additional incompatible clients are identified.
-
-
