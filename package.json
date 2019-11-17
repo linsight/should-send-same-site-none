@@ -1,8 +1,13 @@
 {
   "name": "should-send-same-site-none",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "A simple utility to detect incompatible user agents for `SameSite=None` cookie attribute",
-  "keywords": ["Express", "samesite", "cookie", "middleware"],
+  "keywords": [
+    "Express",
+    "samesite",
+    "cookie",
+    "middleware"
+  ],
   "main": "index.js",
   "scripts": {
     "test": "jest --detectOpenHandles"
