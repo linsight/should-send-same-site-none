@@ -26,7 +26,7 @@ import { isSameSiteNoneCompatible } from 'should-send-same-site-none';
 
 const ua = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14) ....';
 
-if (shouldSendSameSiteNone(ua)) {
+if (isSameSiteNoneCompatible(ua)) {
 	console.log("Yes, the browser is compatible and we can set SameSite=None cookies");
 }
 
@@ -40,9 +40,12 @@ const express = require('express');
 const { shouldSendSameSiteNone } = require('should-send-same-site-none');
 const app = express();
 
-app.use(shouldSendSameSiteNone); // Apply middle ware before routes
+// Apply middleware before routes
+app.use(shouldSendSameSiteNone);
 
 app.get('/', function (req, res) {
+  // Set cookie with SameSite='None' as needed;
+  res.cookie("foo", "bar", { sameSite: "none", secure: true });
   res.send('hello world');
 });
 
