@@ -4,7 +4,7 @@ The module comes with:
 
 - A small **utility function** `isSameSiteNoneCompatible` for detecting incompatible user agents (browsers) for the `SameSite=None` cookie attribute.
 
-- A **Express middleware** `shouldSendSameSiteNone` for automatically removing `SameSite=None` from response header when reqesting client is incompatible with `SameSite=None`.
+- A **Express middleware** `shouldSendSameSiteNone` for automatically removing `SameSite=None` from response header when reqesting client is incompatible with `SameSite=None`. (Note: You are still responsible for adding the 'Secure' cookie attribute whenever applicable.)
 
 ## Background
 

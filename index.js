@@ -8,7 +8,7 @@ function stringToInt(strValue) {
 
 // Don’t send `SameSite=None` to known incompatible clients.
 function isSameSiteNoneCompatible(useragent) {
-  return !isSameSiteNoneIncompatible(useragent);
+  return !isSameSiteNoneIncompatible(String(useragent));
 }
 
 // Classes of browsers known to be incompatible.
