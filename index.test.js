@@ -122,7 +122,7 @@ describe("shouldSendSameSiteNone with mutiple cookies", () => {
         const response = await supertest(app)
           .get("/")
           .set("User-Agent", negativeTestCases[i]);
-        const expected = ["foo=bar; Path=/;,koo=mar; Path=/;"];
+        const expected = ["foo=bar; Path=/;", "koo=mar; Path=/;"];
         expect(response.header["set-cookie"]).toEqual(expected);
         expect(response.text).toEqual("ok");
         done();
@@ -137,7 +137,7 @@ describe("shouldSendSameSiteNone with mutiple cookies", () => {
           .get("/")
           .set("User-Agent", positiveTestCases[i]);
         const expected = [
-          "foo=bar; Path=/; SameSite=None,koo=mar; Path=/; SameSite=None"
+          "foo=bar; Path=/; SameSite=None", "koo=mar; Path=/; SameSite=None"
         ];
         expect(response.header["set-cookie"]).toEqual(expected);
         expect(response.text).toEqual("ok");
