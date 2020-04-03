@@ -118,7 +118,7 @@ var shouldSendSameSiteNone = function(req, res, next) {
     var isCompatible = isSameSiteNoneCompatible(ua);
     var cookies = res.get("Set-Cookie");
     var removeSameSiteNone = function(str) {
-      return str.replace(/ SameSite=None;?/g, "");
+      return str.replace(/;\s*SameSite\s*=\s*None\s*(?=;|$)/ig, "");
     };
     if (!isCompatible && cookies) {
       if (Array.isArray(cookies)) {
