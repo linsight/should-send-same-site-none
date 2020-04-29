@@ -112,13 +112,13 @@ function isUcBrowserVersionAtLeast(major, minor, build, useragent) {
 }
 
 var shouldSendSameSiteNone = function(req, res, next) {
-  var end = res.end;
-  res.end = function() {
+  var writeHead = res.writeHead;
+  res.writeHead = function() {
     var ua = req.get("user-agent");
     var isCompatible = isSameSiteNoneCompatible(ua);
     var cookies = res.get("Set-Cookie");
     var removeSameSiteNone = function(str) {
-      return str.replace(/ SameSite=None;?/g, "");
+      return str.replace(/;\s*SameSite\s*=\s*None\s*(?=;|$)/ig, "");
     };
     if (!isCompatible && cookies) {
       if (Array.isArray(cookies)) {
@@ -129,7 +129,7 @@ var shouldSendSameSiteNone = function(req, res, next) {
       res.set("Set-Cookie", cookies);
     }
 
-    end.apply(this, arguments);
+    writeHead.apply(this, arguments);
   };
   next();
 };
